@@ -7,6 +7,7 @@ import Pusher from "pusher";
 const app = express();
 const port = process.env.PORT || 9000;
 
+// Pusher
 const pusher = new Pusher({
   appId: "1082342",
   key: "c849a85ddc8a40a66142",
@@ -17,6 +18,11 @@ const pusher = new Pusher({
 
 // middleware
 app.use(express.json());
+app.use((req, res, next) => {
+  res.setHeader("Access-Control-Allow-Origin", "*");
+  res.setHeader("Access-Control-Allow-Origin", "*");
+  next();
+});
 // Database config
 const connectionUrl =
   "mongodb+srv://admin:hzgzH7Sxz5o5zESv@cluster0.zidpr.mongodb.net/whatsappDb?retryWrites=true&w=majority";
@@ -40,7 +46,7 @@ db.once("open", () => {
     if (change.operationType === "insert") {
       const messageDetails = change.fullDocument;
       pusher.trigger("messages", "inserted", {
-        name: messageDetails.user,
+        name: messageDetails.name,
         message: messageDetails.message,
       });
     } else {
@@ -48,7 +54,7 @@ db.once("open", () => {
     }
   });
 });
-// ???
+
 // api routes
 app.get("/", (req, res) => res.status(200).send("Hello Whatsapp"));
 
